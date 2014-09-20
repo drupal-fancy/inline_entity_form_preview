@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * @file inline_entity_form_preview.module
+ */
+
+/**
+ * Implements hook_inline_entity_form_table_fields_alter().
+ *
+ * @param $fields
+ * @param $context
+ */
+function inline_entity_form_preview_inline_entity_form_table_fields_alter(&$fields, $context) {
+  // Add an entity preview column to the ief table.
+  $fields['field_ief_preview'] = array(
+    'type' => 'callback',
+    'render_callback' => 'inline_entity_form_preview_ief_preview_column',
+    'label' => t('Preview'),
+    'weight' => 101,
+  );
+}
+
+/**
+ * Callback providing a renderable array for an the ief table field (=column).
+ *
+ * @param $entity_type
+ * @param $entity
+ *
+ * @return string
+ */
+function inline_entity_form_preview_ief_preview_column($entity_type, $entity) {
+  // Render the entity with the inline_entity_form_preview view mode.
+  $output = entity_view($entity_type, array($entity->id => $entity), $view_mode = 'inline_entity_form_preview', NULL, FALSE);
+  return $output;
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ * Creates our custom view mode.
+ * 
+ * @param $entity_infos
+ */
+function inline_entity_form_preview_entity_info_alter(&$entity_infos) {
+  foreach ($entity_infos as $bundle => $entity_info) {
+    $entity_infos[$bundle]['view modes']['inline_entity_form_preview'] = array(
+      'label' => t('Inline entity form preview'),
+      'custom settings' => FALSE,
+    );
+  }
+}
+
+/**
+ * Implements hook_form_field_ui_display_overview_form_alter().
+ *
+ * @param $form
+ * @param $form_state
+ */
+function inline_entity_form_preview_form_field_ui_display_overview_form_alter(&$form, &$form_state) {
+  if ($form['#view_mode'] == 'inline_entity_form_preview') {
+    drupal_set_message('This is a placeholder view mode from the inline_entity_form_preview module. It will used to display a preview of the entity in the inline_entity_form widget form.', 'status');
+  }
+}

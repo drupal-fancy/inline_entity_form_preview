@@ -32,7 +32,7 @@ function inline_entity_form_preview_ief_preview_column($entity_type, $entity) {
 function inline_entity_form_preview_entity_info_alter(&$entity_infos) {
   foreach ($entity_infos as $bundle => $entity_info) {
     $entity_infos[$bundle]['view modes']['inline_entity_form_preview'] = array(
-      'label' => t('Inline entity form preview'),
+      'label' => t('Preview'),
       'custom settings' => FALSE,
     );
   }

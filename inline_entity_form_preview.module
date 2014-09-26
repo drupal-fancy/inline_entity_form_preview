@@ -22,6 +22,7 @@ function inline_entity_form_preview_inline_entity_form_table_fields_alter(&$fiel
  * Callback for preview column.
  */
 function inline_entity_form_preview_ief_preview_column($entity_type, $entity) {
+  $entity->id = isset($entity->id) ? $entity->id : 0;
   return entity_view($entity_type, array($entity->id => $entity), 'inline_entity_form_preview');
 }
 

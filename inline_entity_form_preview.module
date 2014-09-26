@@ -43,7 +43,7 @@ function inline_entity_form_preview_entity_info_alter(&$entity_infos) {
  */
 function inline_entity_form_preview_form_field_ui_display_overview_form_alter(&$form, &$form_state) {
   if ($form['#view_mode'] == 'inline_entity_form_preview') {
-    drupal_set_message(t('This is a placeholder view mode provided by <a href="@inline-entity-form-preview">Inline Entity Form Preview module</a>. It will be used to display a preview of the entity in the %inline-entity-form widget.', array(
+    drupal_set_message(t('This is a placeholder view mode provided by <a href="@inline-entity-form-preview">Inline Entity Form Preview</a> module. It will be used to display a preview of the entity in the %inline-entity-form widget.', array(
       '@inline-entity-form-preview' => url('https://www.drupal.org/project/inline_entity_form_preview'),
       '%inline-entity-form' => 'Inline entity form',
     )), 'status');

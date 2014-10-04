@@ -23,7 +23,31 @@ function inline_entity_form_preview_inline_entity_form_table_fields_alter(&$fiel
  */
 function inline_entity_form_preview_ief_preview_column($entity_type, $entity) {
   $entity->id = isset($entity->id) ? $entity->id : 0;
-  return entity_view($entity_type, array($entity->id => $entity), 'inline_entity_form_preview');
+  list(,, $bundle) = entity_extract_ids($entity_type, $entity);
+  $fields = field_info_instances($entity_type, $bundle);
+  $view_mode = 'inline_entity_form_preview';
+  $entity_view = entity_view($entity_type, array($entity->id => $entity), $view_mode);
+
+  // View Mode Selector support.
+  if (module_exists('view_mode_selector')) {
+    foreach ($fields as $field_name => $instance) {
+      $field_info = field_info_field($field_name);
+
+      // Override view mode of entity when
+      // a View Mode Selector field is available.
+      if ($field_info['type'] == 'view_mode_selector') {
+        $field_items = field_get_items($entity_type, $entity, $field_name);
+
+        // Re-render entity if a view mode selector was set.
+        if ($field_items) {
+          $view_mode = $field_items[0]['value'];
+          $entity_view = entity_view($entity_type, array($entity->id => $entity), $view_mode);
+        }
+      }
+    }
+  }
+
+  return $entity_view;
 }
 
 /**

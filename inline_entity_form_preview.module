@@ -6,6 +6,78 @@
  */
 
 /**
+ * Implements hook_entity_info_alter().
+ */
+function inline_entity_form_preview_entity_info_alter(&$entity_infos) {
+  foreach ($entity_infos as $bundle => $entity_info) {
+    $entity_infos[$bundle]['view modes']['inline_entity_form_preview'] = array(
+      'label' => t('Preview'),
+      'custom settings' => FALSE,
+    );
+  }
+}
+
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+function inline_entity_form_field_widget_info_alter(&$info) {
+  $info['inline_entity_form']['settings'] += array(
+    'preview' => array(
+      'enable' => 0,
+      'view_mode' => '',
+    ),
+  );
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'field_ui_field_edit_form') {
+    $instance_info = $form['#instance'];
+    $widget_settings = $instance_info['widget']['settings'];
+
+    // We only want to alter settings only for inline entity form widgets.
+    if ($instance_info['widget']['type'] != 'inline_entity_form') {
+      return;
+    }
+
+    $instance = &$form['instance'];
+    $widget = &$instance['widget'];
+    $settings = &$widget['settings'];
+    $target_entity_type = $form['#field']['settings']['target_type'];
+    $bundle = $instance_info['bundle'];
+    $target_bundles = $form['#field']['settings']['handler_settings']['target_bundles'];
+    $field_name = $instance_info['field_name'];
+
+    $settings['preview'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Preview'),
+    );
+
+    $settings['preview']['enable'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable preview column'),
+      '#description' => t('This will add a preview column to your inline entity form table.'),
+      '#default_value' => isset($widget_settings['preview']['enable']) ? $widget_settings['preview']['enable'] : '',
+    );
+
+    $settings['preview']['view_mode'] = array(
+      '#type' => 'select',
+      '#title' => t('View mode'),
+      '#options' => inline_entity_form_preview_view_modes($target_entity_type, $target_bundles),
+      '#description' => t('Select the view mode which should be used for preview'),
+      '#default_value' => isset($widget_settings['preview']['view_mode']) ? $widget_settings['preview']['view_mode'] : '',
+      '#states' => array(
+        'visible' => array(
+          'input[name$="[preview][enable]"]' => array('checked' => TRUE),
+        ),
+      ),
+    );
+  }
+}
+
+/**
  * Implements hook_inline_entity_form_table_fields_alter().
  */
 function inline_entity_form_preview_inline_entity_form_table_fields_alter(&$fields, $context) {
@@ -21,55 +93,68 @@ function inline_entity_form_preview_inline_entity_form_table_fields_alter(&$fiel
 /**
  * Callback for preview column.
  */
-function inline_entity_form_preview_ief_preview_column($entity_type, $entity) {
+function inline_entity_form_preview_ief_preview_column($entity_type, $entity, $context) {
   $entity->id = isset($entity->id) ? $entity->id : 0;
-  list(,, $bundle) = entity_extract_ids($entity_type, $entity);
-  $fields = field_info_instances($entity_type, $bundle);
-  $view_mode = 'inline_entity_form_preview';
-  $entity_view = entity_view($entity_type, array($entity->id => $entity), $view_mode);
+  $entity_type = $context['entity_type'];
+  $field_name = $context['field_name'];
+  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
 
-  // View Mode Selector support.
-  if (module_exists('view_mode_selector')) {
-    foreach ($fields as $field_name => $instance) {
-      $field_info = field_info_field($field_name);
+  // Load field instance to get the preview settings.
+  $instance = field_info_instance($context['parent_entity_type'], $field_name, $context['parent_bundle']);
+  $settings = $instance['widget']['settings']['preview'];
+  $view_mode = $settings['view_mode'];
 
-      // Override view mode of entity when
-      // a View Mode Selector field is available.
-      if ($field_info['type'] == 'view_mode_selector') {
-        $field_items = field_get_items($entity_type, $entity, $field_name);
-
-        // Re-render entity if a view mode selector was set.
-        if ($field_items) {
-          $view_mode = $field_items[0]['value'];
-          $entity_view = entity_view($entity_type, array($entity->id => $entity), $view_mode);
-        }
-      }
-    }
+  if (!$settings['enable']) {
+    return array();
   }
+
+  $entity_view = entity_view($entity_type, array($entity->id => $entity), $view_mode);
 
   return $entity_view;
 }
 
 /**
- * Implements hook_entity_info_alter().
+ * Helper function which returns all view modes of an entity type.
+ *
+ * @param string $entity_type
+ *   The specific entity type.
+ * @param array $bundles
+ *   An array containing allowed bundles.
+ *
+ * @return array
+ *   An array containing all view modes of passed bundles.
  */
-function inline_entity_form_preview_entity_info_alter(&$entity_infos) {
-  foreach ($entity_infos as $bundle => $entity_info) {
-    $entity_infos[$bundle]['view modes']['inline_entity_form_preview'] = array(
-      'label' => t('Preview'),
-      'custom settings' => FALSE,
+function inline_entity_form_preview_view_modes($entity_type, $bundles = array()) {
+  $bundle_count = count($bundles);
+  $view_modes_prepared = array();
+  $entity_info = entity_get_info($entity_type);
+
+  foreach ($entity_info['bundles'] as $bundle => $bundle_info) {
+    // If bundles filter is set and the current bundle does not
+    // exist in the filter, skip.
+    if ($bundle_count && !array_key_exists($bundle, $bundles)) {
+      continue;
+    }
+
+    // Load view mode settings for the current bundle.
+    $view_mode_settings = field_view_mode_settings($entity_type, $bundle);
+
+    foreach ($view_mode_settings as $view_mode_name => $view_mode) {
+      // If custom settings are used for this bundle, add it to the array.
+      if ($view_mode['custom_settings'] && isset($entity_info['view modes'][$view_mode_name]) && !isset($view_modes_prepared[$view_mode_name])) {
+        $view_modes_prepared[$view_mode_name] = t($entity_info['view modes'][$view_mode_name]['label']);
+      }
+    }
+  }
+
+  // Add 'default' view mode.
+  if (!isset($view_modes['default'])) {
+    // Add 'Default' view mode to all view modes.
+    $view_modes['default'] = array(
+      'label' => t('Default'),
+      'custom settings' => TRUE,
     );
   }
-}
 
-/**
- * Implements hook_form_field_ui_display_overview_form_alter().
- */
-function inline_entity_form_preview_form_field_ui_display_overview_form_alter(&$form, &$form_state) {
-  if ($form['#view_mode'] == 'inline_entity_form_preview') {
-    drupal_set_message(t('This is a placeholder view mode provided by <a href="@inline-entity-form-preview">Inline Entity Form Preview</a> module. It will be used to display a preview of the entity in the %inline-entity-form widget.', array(
-      '@inline-entity-form-preview' => url('https://www.drupal.org/project/inline_entity_form_preview'),
-      '%inline-entity-form' => 'Inline entity form',
-    )), 'status');
-  }
+  return $view_modes_prepared;
 }

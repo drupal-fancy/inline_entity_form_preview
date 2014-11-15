@@ -81,7 +81,6 @@ function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
  * Implements hook_inline_entity_form_table_fields_alter().
  */
 function inline_entity_form_preview_inline_entity_form_table_fields_alter(&$fields, $context) {
-  // Add an entity preview column to the IEF table.
   $fields['field_ief_preview'] = array(
     'type' => 'callback',
     'render_callback' => 'inline_entity_form_preview_ief_preview_column',

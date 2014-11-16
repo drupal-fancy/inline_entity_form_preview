@@ -113,10 +113,6 @@ function inline_entity_form_preview_ief_preview_column($entity_type, $entity, $c
   $settings = $instance['widget']['settings']['preview'];
   $view_mode = $settings['view_mode'];
 
-  if (!$settings['enable']) {
-    return array();
-  }
-
   $entity_view = entity_view($entity_type, array($entity->id => $entity), $view_mode);
 
   return $entity_view;

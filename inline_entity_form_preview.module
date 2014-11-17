@@ -25,6 +25,7 @@ function inline_entity_form_field_widget_info_alter(&$info) {
     'preview' => array(
       'enable' => 0,
       'view_mode' => '',
+      'fallback_view_mode' => 'default',
     ),
   );
 }
@@ -59,22 +60,65 @@ function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
       '#type' => 'checkbox',
       '#title' => t('Enable preview column'),
       '#description' => t('This will add a preview column to your inline entity form table.'),
-      '#default_value' => isset($widget_settings['preview']['enable']) ? $widget_settings['preview']['enable'] : '',
+      '#default_value' => $widget_settings['preview']['enable'],
     );
 
     $settings['preview']['view_mode'] = array(
       '#type' => 'select',
       '#title' => t('View mode'),
+      '#required' => TRUE,
       '#options' => inline_entity_form_preview_view_modes($target_entity_type, $target_bundles),
-      '#description' => t('Select the view mode which should be used for preview'),
-      '#default_value' => isset($widget_settings['preview']['view_mode']) ? $widget_settings['preview']['view_mode'] : '',
+      '#description' => t('Select the view mode which should be used for preview.'),
       '#states' => array(
         'visible' => array(
           'input[name$="[preview][enable]"]' => array('checked' => TRUE),
         ),
       ),
+      '#ajax' => array(
+        'callback' => 'inline_entity_form_preview_fallback_view_modes',
+        'wrapper' => 'inline-entity-form-preview-fallback-view-mode',
+        'method' => 'replace',
+        'message' => '',
+      ),
     );
+
+    if (!empty($widget_settings['preview']['view_mode'])) {
+      $settings['preview']['view_mode']['#default_value'] = $widget_settings['preview']['view_mode'];
+    }
+
+    $settings['preview']['fallback_view_mode'] = array(
+      '#type' => 'select',
+      '#title' => t('Fallback view mode'),
+      '#options' => inline_entity_form_preview_view_modes($target_entity_type, $target_bundles),
+      '#description' => t('Which view mode should be used when the above selected view mode does not exist.'),
+      '#empty_option' => t('- None -'),
+      '#states' => array(
+        'visible' => array(
+          'input[name$="[preview][enable]"]' => array('checked' => TRUE),
+          'input[name$="[preview][view_mode]"]' => array('value' => TRUE),
+        ),
+      ),
+      '#prefix' => '<div id="inline-entity-form-preview-fallback-view-mode">',
+      '#suffix' => '</div>',
+    );
+
+    if (!empty($widget_settings['preview']['fallback_view_mode'])) {
+      $settings['preview']['fallback_view_mode']['#default_value'] = $widget_settings['preview']['fallback_view_mode'];
+    }
   }
+}
+
+function inline_entity_form_preview_fallback_view_modes($form, $form_state) {
+  $widget = $form['instance']['widget']['settings'];
+  $settings = $form_state['values']['instance']['widget']['settings']['preview'];
+
+  if (!$settings['view_mode'] || $settings['view_mode'] == 'default') {
+    return array();
+  }
+
+  unset($widget['preview']['fallback_view_mode']['#options'][$settings['view_mode']]);
+
+  return $widget['preview']['fallback_view_mode'];
 }
 
 /**
@@ -107,11 +151,20 @@ function inline_entity_form_preview_ief_preview_column($entity_type, $entity, $c
   $entity_type = $context['entity_type'];
   $field_name = $context['field_name'];
   list(, , $bundle) = entity_extract_ids($entity_type, $entity);
+  $view_modes = field_view_mode_settings($entity_type, $bundle);
 
   // Load field instance to get the preview settings.
   $instance = field_info_instance($context['parent_entity_type'], $field_name, $context['parent_bundle']);
   $settings = $instance['widget']['settings']['preview'];
   $view_mode = $settings['view_mode'];
+  $fallback_view_mode = $settings['fallback_view_mode'];
+
+  if (empty($view_modes[$view_mode]['custom_settings']) && $fallback_view_mode) {
+    $view_mode = $fallback_view_mode;
+  }
+  elseif (empty($view_modes[$view_mode]['custom_settings']) && !$fallback_view_mode) {
+    return array();
+  }
 
   $entity_view = entity_view($entity_type, array($entity->id => $entity), $view_mode);
 

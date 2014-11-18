@@ -98,7 +98,6 @@ function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
       '#states' => array(
         'visible' => array(
           'input[name$="[preview][enable]"]' => array('checked' => TRUE),
-          'select[name$="[preview][view_mode]"]' => array('value' => TRUE),
         ),
       ),
       '#prefix' => '<div id="inline-entity-form-preview-fallback-view-mode">',

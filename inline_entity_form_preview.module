@@ -208,9 +208,7 @@ function inline_entity_form_preview_view_modes($entity_type, $bundles = array())
   asort($view_modes_prepared);
 
   // Add 'default' view mode.
-  if (!isset($view_modes_prepared['default'])) {
-    $view_modes_prepared = array('default' => t('Default')) + $view_modes_prepared;
-  }
+  $view_modes_prepared = array('default' => t('Default')) + $view_modes_prepared;
 
   return $view_modes_prepared;
 }

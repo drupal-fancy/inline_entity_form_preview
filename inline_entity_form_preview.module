@@ -53,12 +53,12 @@ function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
     $settings['preview'] = array(
       '#type' => 'fieldset',
       '#title' => t('Preview'),
+      '#description' => t('Referenced entities can be displayed in an extra column when editing the form.'),
     );
 
     $settings['preview']['enable'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enable preview column'),
-      '#description' => t('This will add a preview column to your inline entity form table.'),
       '#default_value' => $widget_settings['preview']['enable'],
     );
 

@@ -129,6 +129,7 @@ function inline_entity_form_preview_fallback_view_modes($form, $form_state) {
  */
 function inline_entity_form_preview_inline_entity_form_table_fields_alter(&$fields, $context) {
   $entity_type = $context['entity_type'];
+  $field_name = $context['field_name'];
 
   // Load field instance to get the preview settings.
   $instance = field_info_instance($context['parent_entity_type'], $field_name, $context['parent_bundle']);

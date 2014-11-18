@@ -156,13 +156,13 @@ function inline_entity_form_preview_ief_preview_column($entity_type, $entity, $c
 
   // Load field instance to get the preview settings.
   $instance = field_info_instance($context['parent_entity_type'], $field_name, $context['parent_bundle']);
+  $settings = $instance['widget']['settings']['preview'];
 
   // Do not break previews for people coming from 7.x-1.0-beta2.
   if (!isset($settings['preview'])) {
     return entity_view($entity_type, array($entity->id => $entity), 'inline_entity_form_preview');
   }
 
-  $settings = $instance['widget']['settings']['preview'];
   $view_mode = $settings['view_mode'];
   $fallback_view_mode = $settings['fallback_view_mode'];
   $needs_fallback = empty($view_modes[$view_mode]['custom_settings']);

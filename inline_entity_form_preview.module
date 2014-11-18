@@ -88,7 +88,7 @@ function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
     $settings['preview']['fallback_view_mode'] = array(
       '#type' => 'select',
       '#title' => t('Fallback view mode'),
-      '#description' => t('Which view mode should be used when the above selected view mode does not exist.'),
+      '#description' => t('Which view mode should be used when the view mode selected above does not exist.'),
       '#options' => $view_modes,
       '#empty_option' => t('- None -'),
       '#states' => array(

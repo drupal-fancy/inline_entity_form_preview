@@ -48,6 +48,7 @@ function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
     $settings = &$widget['settings'];
     $target_entity_type = $form['#field']['settings']['target_type'];
     $target_bundles = $form['#field']['settings']['handler_settings']['target_bundles'];
+    $view_modes = inline_entity_form_preview_view_modes($target_entity_type, $target_bundles);
 
     $settings['preview'] = array(
       '#type' => 'fieldset',
@@ -65,7 +66,6 @@ function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
       '#type' => 'select',
       '#title' => t('View mode'),
       '#required' => TRUE,
-      '#options' => inline_entity_form_preview_view_modes($target_entity_type, $target_bundles),
       '#description' => t('Select the view mode which should be used for preview.'),
       '#states' => array(
         'visible' => array(
@@ -90,8 +90,8 @@ function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
     $settings['preview']['fallback_view_mode'] = array(
       '#type' => 'select',
       '#title' => t('Fallback view mode'),
-      '#options' => inline_entity_form_preview_view_modes($target_entity_type, $target_bundles),
       '#description' => t('Which view mode should be used when the above selected view mode does not exist.'),
+      '#options' => $view_modes,
       '#empty_option' => t('- None -'),
       '#states' => array(
         'visible' => array(

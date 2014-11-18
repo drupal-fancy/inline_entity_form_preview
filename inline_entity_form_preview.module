@@ -116,7 +116,7 @@ function inline_entity_form_preview_fallback_view_modes($form, $form_state) {
   $widget = $form['instance']['widget']['settings'];
   $settings = $form_state['values']['instance']['widget']['settings']['preview'];
 
-  if (!$settings['view_mode'] || $settings['view_mode'] == 'default') {
+  if (!$settings['view_mode'] == 'default') {
     $widget['preview']['fallback_view_mode']['#prefix'] = '<div id="inline-entity-form-preview-fallback-view-mode" style="display: none;">';
   }
 

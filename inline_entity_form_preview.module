@@ -20,7 +20,7 @@ function inline_entity_form_preview_entity_info_alter(&$entity_infos) {
 /**
  * Implements hook_field_widget_info_alter().
  */
-function inline_entity_form_field_widget_info_alter(&$info) {
+function inline_entity_form_preview_field_widget_info_alter(&$info) {
   $info['inline_entity_form']['settings'] += array(
     'preview' => array(
       'enable' => 0,

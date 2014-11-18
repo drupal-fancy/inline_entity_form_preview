@@ -47,9 +47,7 @@ function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
     $widget = &$instance['widget'];
     $settings = &$widget['settings'];
     $target_entity_type = $form['#field']['settings']['target_type'];
-    $bundle = $instance_info['bundle'];
     $target_bundles = $form['#field']['settings']['handler_settings']['target_bundles'];
-    $field_name = $instance_info['field_name'];
 
     $settings['preview'] = array(
       '#type' => 'fieldset',
@@ -128,8 +126,6 @@ function inline_entity_form_preview_fallback_view_modes($form, $form_state) {
  */
 function inline_entity_form_preview_inline_entity_form_table_fields_alter(&$fields, $context) {
   $entity_type = $context['entity_type'];
-  $field_name = $context['field_name'];
-  $bundle = $context['parent_bundle'];
 
   // Load field instance to get the preview settings.
   $instance = field_info_instance($context['parent_entity_type'], $field_name, $context['parent_bundle']);

@@ -1,5 +1,5 @@
 name = Inline Entity Form Preview
-description = Adds a preview column to the Inline Entity Form which displays referenced entity.
+description = Provides a preview column to display referenced entities directly.
 package = Fields
 core = 7.x
 dependencies[] = inline_entity_form

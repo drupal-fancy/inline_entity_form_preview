@@ -65,8 +65,8 @@ function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
     $settings['preview']['view_mode'] = array(
       '#type' => 'select',
       '#title' => t('View mode'),
-      '#required' => TRUE,
       '#description' => t('Select the view mode which should be used for preview.'),
+      '#required' => TRUE,
       '#default_value' => $widget_settings['preview']['view_mode'],
       '#states' => array(
         'visible' => array(

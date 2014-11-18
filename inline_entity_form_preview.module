@@ -158,11 +158,12 @@ function inline_entity_form_preview_ief_preview_column($entity_type, $entity, $c
   $settings = $instance['widget']['settings']['preview'];
   $view_mode = $settings['view_mode'];
   $fallback_view_mode = $settings['fallback_view_mode'];
+  $needs_fallback = empty($view_modes[$view_mode]['custom_settings']);
 
-  if (empty($view_modes[$view_mode]['custom_settings']) && $fallback_view_mode) {
+  if ($needs_fallback && $fallback_view_mode) {
     $view_mode = $fallback_view_mode;
   }
-  elseif (empty($view_modes[$view_mode]['custom_settings']) && (!$fallback_view_mode || empty($view_modes[$fallback_view_mode]['custom_settings']))) {
+  elseif ($needs_fallback && (!$fallback_view_mode || empty($view_modes[$fallback_view_mode]['custom_settings']))) {
     return array();
   }
 

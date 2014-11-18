@@ -132,7 +132,7 @@ function inline_entity_form_preview_inline_entity_form_table_fields_alter(&$fiel
   // Load field instance to get the preview settings.
   $field_name = $context['field_name'];
   $instance = field_info_instance($context['parent_entity_type'], $field_name, $context['parent_bundle']);
-  $settings = isset($instance['widget']['settings']['preview']) ? $instance['widget']['settings']['preview'] : TRUE;
+  $settings = isset($instance['widget']['settings']['preview']) ? $instance['widget']['settings']['preview'] : array('enable' => 1);
 
   if ($settings['enable']) {
     $fields['field_ief_preview'] = array(

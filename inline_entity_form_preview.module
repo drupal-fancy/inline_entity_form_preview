@@ -108,6 +108,9 @@ function inline_entity_form_preview_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+/**
+ * AJAX callback for fallback view mode settings field.
+ */
 function inline_entity_form_preview_fallback_view_modes($form, $form_state) {
   $widget = $form['instance']['widget']['settings'];
   $settings = $form_state['values']['instance']['widget']['settings']['preview'];

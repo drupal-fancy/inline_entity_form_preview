@@ -162,7 +162,7 @@ function inline_entity_form_preview_ief_preview_column($entity_type, $entity, $c
   if (empty($view_modes[$view_mode]['custom_settings']) && $fallback_view_mode) {
     $view_mode = $fallback_view_mode;
   }
-  elseif (empty($view_modes[$view_mode]['custom_settings']) && !$fallback_view_mode) {
+  elseif (empty($view_modes[$view_mode]['custom_settings']) && (!$fallback_view_mode || empty($view_modes[$fallback_view_mode]['custom_settings']))) {
     return array();
   }
 

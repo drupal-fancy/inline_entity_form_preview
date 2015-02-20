@@ -149,6 +149,9 @@ function inline_entity_form_preview_get_view_mode_options($entity_type) {
 /**
  * Helper function which returns all enabled view modes for a given entity bundle.
  *
+ * @todo replace with getDisplayModeOptions()
+ *   https://www.drupal.org/node/2322503
+ *
  * @return array
  *   An array containing all enabled view modes.
  */

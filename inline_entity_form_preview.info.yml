@@ -3,3 +3,5 @@ type: module
 description: Provides a preview column to display referenced entities directly.
 core: 8.x
 package: Fields
+dependencies:
+  - inline_entity_form
